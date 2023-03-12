@@ -3,49 +3,49 @@ import ipaddress
 import socket
 import requests
 
-while True:
-    # This method extracts the server data from a website
-    def extractData():
-        url = input("Enter a URL which you would like to send a HTTP GET request to the web server(e.g http://www.google.com): ")
-        # send a HTTP GET request to the web server
+def extractData():
+    url = input("Enter a URL to extract data from (e.g. http://www.google.com): ")
+    try:
         response = requests.get(url)
-        
-        # check the status code of the response
-        if response.status_code == 200:
-            # extract the data from the response
-            data = response.text
-            print(data)
-            
-    # This method is the method used for subnetting by entering a mask and an IP address
-    def subnetting():
-        # Prompt the user for the IP address and mask to use for subnetting
-        ip_address = input('Enter the IP address to use for subnetting: ')
-        mask = input('Enter the subnet mask to use for subnetting: ')
-        
-        # Create a network object using the provided IP address and mask
-        network = ipaddress.ip_network(ip_address + '/' + mask, strict=False)
-    
-        # Print the network address, broadcast address, and number of hosts for the network
-        print('Network address:', network.network_address)
-        print('Broadcast address:', network.broadcast_address)
-        print('Number of hosts:', network.num_addresses)
-        
-    # This method is used to read an IP address of any base URL/link
-    def readIPAddress():
-        try:
-            link = input("Enter a URL: ")
-            ip_address = socket.gethostbyname(link)
-            print(ip_address)
-        except socket.gaierror:
-            print("Could not resolve IP address for ", link)
-            
-    # Main method to call upon the functions based on user's selection
-    def main():
-        print("List of processes:")
+        response.raise_for_status()
+        data = response.text
+        print(data)
+    except requests.exceptions.HTTPError as e:
+        print("HTTP Error:", e)
+    except requests.exceptions.ConnectionError:
+        print("Connection Error: Could not connect to", url)
+    except requests.exceptions.Timeout:
+        print("Timeout Error: Request timed out")
+    except requests.exceptions.RequestException as e:
+        print("Error:", e)
+
+def subnetting():
+    ip_address = input("Enter an IP address to subnet (e.g. 192.168.0.0): ")
+    mask = input("Enter the subnet mask (e.g. 24): ")
+    try:
+        network = ipaddress.ip_network(ip_address+'/'+mask, strict=False)
+        print("Network address:", network.network_address)
+        print("Broadcast address:", network.broadcast_address)
+        print("Number of hosts:", network.num_addresses)
+    except ValueError:
+        print("Invalid IP address or mask")
+
+def readIPAddress():
+    try:
+        link = input("Enter a URL to read its IP address: ")
+        ip_address = socket.gethostbyname(link)
+        print(ip_address)
+    except socket.gaierror:
+        print("Could not resolve IP address for", link)
+
+def main():
+    while True:
+        print("\nSelect a networking process:")
         print("1. Read IP Address")
         print("2. Subnetting")
         print("3. Extract Data from a Network")
-        response = input("What networking process would you like to run(Enter a number or 'close program' to exit): ")
+        print("4. Quit")
+        response = input("Enter the number of your selection: ")
         
         if response == "1":
             readIPAddress()
@@ -53,7 +53,11 @@ while True:
             subnetting()
         elif response == "3":
             extractData()
-        elif response == "close program":
-            quit()
-    
-main()
+        elif response == "4":
+            print("Exiting program...")
+            break
+        else:
+            print("Invalid selection")
+
+if __name__ == "__main__":
+    main()
