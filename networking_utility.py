@@ -1,7 +1,10 @@
 # import necessary modules
+from rich.console import Console
 import ipaddress
 import socket
 import requests
+
+console = Console()
 
 def extractData():
     url = input("Enter a URL to extract data from (e.g. http://www.google.com): ")
@@ -9,42 +12,42 @@ def extractData():
         response = requests.get(url)
         response.raise_for_status()
         data = response.text
-        print(data)
+        console.print(data)
     except requests.exceptions.HTTPError as e:
-        print("HTTP Error:", e)
+        console.print("HTTP Error:", e)
     except requests.exceptions.ConnectionError:
-        print("Connection Error: Could not connect to", url)
+        console.print("Connection Error: Could not connect to", url)
     except requests.exceptions.Timeout:
-        print("Timeout Error: Request timed out")
+        console.print("Timeout Error: Request timed out")
     except requests.exceptions.RequestException as e:
-        print("Error:", e)
+        console.print("Error:", e)
 
 def subnetting():
     ip_address = input("Enter an IP address to subnet (e.g. 192.168.0.0): ")
     mask = input("Enter the subnet mask (e.g. 24): ")
     try:
         network = ipaddress.ip_network(ip_address+'/'+mask, strict=False)
-        print("Network address:", network.network_address)
-        print("Broadcast address:", network.broadcast_address)
-        print("Number of hosts:", network.num_addresses)
+        console.print("Network address:", network.network_address)
+        console.print("Broadcast address:", network.broadcast_address)
+        console.print("Number of hosts:", network.num_addresses)
     except ValueError:
-        print("Invalid IP address or mask")
+        console.print("Invalid IP address or mask")
 
 def readIPAddress():
     try:
         link = input("Enter a URL to read its IP address: ")
         ip_address = socket.gethostbyname(link)
-        print(ip_address)
+        console.print(ip_address)
     except socket.gaierror:
-        print("Could not resolve IP address for", link)
+        console.print("Could not resolve IP address for", link)
 
 def main():
     while True:
-        print("\nSelect a networking process:")
-        print("1. Read IP Address")
-        print("2. Subnetting")
-        print("3. Extract Data from a Network")
-        print("4. Quit")
+        console.print("\nSelect a networking process:")
+        console.print("1. Read IP Address")
+        console.print("2. Subnetting")
+        console.print("3. Extract Data from a Network")
+        console.print("4. Quit")
         response = input("Enter the number of your selection: ")
         
         if response == "1":
@@ -57,7 +60,7 @@ def main():
             print("Exiting program...")
             break
         else:
-            print("Invalid selection")
+            console.print("Invalid selection")
 
 if __name__ == "__main__":
     main()
